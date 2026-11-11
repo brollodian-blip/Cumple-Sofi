@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Estás invitado a mi Cumpleaños! 🎉</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Pacifico&display=swap');
+        
+        body {
+            font-family: 'Outfit', sans-serif;
+        }
+        .font-pacifico {
+            font-family: 'Pacifico', cursive;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .glass-dark {
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .gradient-bg {
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen text-slate-800 flex flex-col justify-between relative selection:bg-pink-500 selection:text-white">
+
+    <!-- Header Navigation -->
+    <header class="w-full p-4 flex justify-between items-center max-w-5xl mx-auto z-10 gap-2">
+        <div class="flex items-center gap-2 font-bold text-white text-lg md:text-xl tracking-wider">
+            <i class="fa-solid fa-cake-candles text-yellow-300 animate-bounce"></i>
+            <span id="navTitle">MY PARTY</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <button onclick="toggleEditModal()" class="bg-amber-400 hover:bg-amber-500 text-slate-900 backdrop-blur-md px-3.5 py-2 rounded-full text-xs md:text-sm font-bold transition-all flex items-center gap-2 shadow-lg border border-amber-300">
+                <i class="fa-solid fa-pen-to-square"></i>
+                <span>Editar Evento</span>
+            </button>
+            <button onclick="toggleAdminModal()" class="bg-white/20 hover:bg-white/30 text-white backdrop-blur-md px-3.5 py-2 rounded-full text-xs md:text-sm font-semibold transition-all flex items-center gap-2 shadow-lg border border-white/20">
+                <i class="fa-solid fa-user-gear"></i>
+                <span>Admin RSVP</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="container mx-auto px-4 py-6 max-w-4xl flex-grow flex flex-col items-center justify-center">
+
+        <!-- Banner / Header de la Invitación con FOTO -->
+        <div class="w-full text-center text-white mb-8 flex flex-col items-center">
+            
+            <!-- Foto del Cumpleañero/a -->
+            <div class="relative mb-4 group">
+                <div class="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-white shadow-2xl bg-white/30 backdrop-blur-sm flex items-center justify-center relative">
+                    <img id="birthdayPhoto" src="https://placehold.co/400x400/e73c7e/ffffff?text=Mi+Foto" alt="Foto Cumpleañera" class="w-full h-full object-cover">
+                </div>
+                <button onclick="toggleEditModal()" class="absolute bottom-1 right-1 bg-amber-400 text-slate-900 p-2 rounded-full shadow-lg text-xs hover:scale-110 transition" title="Cambiar Foto">
+                    <i class="fa-solid fa-camera"></i>
+                </button>
+            </div>
+
+            <span class="bg-yellow-400 text-slate-900 text-xs uppercase font-extrabold tracking-widest px-4 py-1.5 rounded-full shadow-md inline-block mb-3">
+                ¡Estás cordialmente invitado!
+            </span>
+            <h1 class="font-pacifico text-4xl md:text-7xl mb-2 drop-shadow-md text-amber-200">
+                ¡Cumple de <span id="displayName">Alex</span>! 🎉
+            </h1>
+            <p id="displaySubtitle" class="text-lg md:text-xl font-light opacity-90 max-w-xl mx-auto">
+                Un día especial para celebrar, compartir risas y crear recuerdos memorables. ¡Código de Vestimenta: Formal / Elegante!
+            </p>
+        </div>
+
+        <!-- Cuenta Regresiva -->
+        <div class="glass-card rounded-2xl p-6 shadow-2xl w-full max-w-2xl mb-8 border border-white/40">
+            <h3 class="text-center font-bold text-slate-700 uppercase tracking-wider text-xs mb-4">
+                <i class="fa-solid fa-clock text-pink-500 mr-1"></i> Faltan exactamente:
+            </h3>
+            <div class="grid grid-cols-4 gap-2 md:gap-4 text-center">
+                <div class="bg-white/80 p-3 rounded-xl shadow-inner">
+                    <span id="days" class="text-2xl md:text-4xl font-extrabold text-pink-600 block">00</span>
+                    <span class="text-xs text-slate-500 font-semibold uppercase">Días</span>
+                </div>
+                <div class="bg-white/80 p-3 rounded-xl shadow-inner">
+                    <span id="hours" class="text-2xl md:text-4xl font-extrabold text-purple-600 block">00</span>
+                    <span class="text-xs text-slate-500 font-semibold uppercase">Hs</span>
+                </div>
+                <div class="bg-white/80 p-3 rounded-xl shadow-inner">
+                    <span id="minutes" class="text-2xl md:text-4xl font-extrabold text-blue-600 block">00</span>
+                    <span class="text-xs text-slate-500 font-semibold uppercase">Min</span>
+                </div>
+                <div class="bg-white/80 p-3 rounded-xl shadow-inner">
+                    <span id="seconds" class="text-2xl md:text-4xl font-extrabold text-emerald-600 block">00</span>
+                    <span class="text-xs text-slate-500 font-semibold uppercase">Seg</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detalles del Evento -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-4xl mb-8">
+            <div class="glass-card rounded-2xl p-6 text-center shadow-lg hover:transform hover:-translate-y-1 transition-all duration-300">
+                <div class="w-12 h-12 bg-pink-100 text-pink-500 rounded-full flex items-center justify-center mx-auto mb-3 text-xl shadow">
+                    <i class="fa-solid fa-calendar-day"></i>
+                </div>
+                <h4 class="font-bold text-slate-800 text-lg">Fecha</h4>
+                <p id="displayDate" class="text-slate-600 mt-1">Sábado, 20 de Noviembre</p>
+            </div>
+            <div class="glass-card rounded-2xl p-6 text-center shadow-lg hover:transform hover:-translate-y-1 transition-all duration-300">
+                <div class="w-12 h-12 bg-purple-100 text-purple-500 rounded-full flex items-center justify-center mx-auto mb-3 text-xl shadow">
+                    <i class="fa-solid fa-clock"></i>
+                </div>
+                <h4 class="font-bold text-slate-800 text-lg">Horario</h4>
+                <p id="displayTime" class="text-slate-600 mt-1">20:30 HS (Noche)</p>
+            </div>
+            <div class="glass-card rounded-2xl p-6 text-center shadow-lg hover:transform hover:-translate-y-1 transition-all duration-300">
+                <div class="w-12 h-12 bg-blue-100 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-3 text-xl shadow">
+                    <i class="fa-solid fa-location-dot"></i>
+                </div>
+                <h4 class="font-bold text-slate-800 text-lg">Ubicación</h4>
+                <p id="displayAddress" class="text-slate-600 mt-1">Av. Principal #123</p>
+            </div>
+        </div>
+
+        <!-- Formulario RSVP -->
+        <div class="glass-card rounded-3xl p-6 md:p-10 shadow-2xl w-full max-w-2xl border border-white/50 relative overflow-hidden">
+            <div class="absolute -top-12 -right-12 w-32 h-32 bg-pink-400/20 rounded-full blur-xl pointer-events-none"></div>
+            <div class="text-center mb-6">
+                <h2 class="text-2xl md:text-3xl font-extrabold text-slate-800">Confirma tu Asistencia</h2>
+                <p class="text-sm text-slate-500 mt-1">Por favor confirma antes del 15 de Noviembre</p>
+            </div>
+
+            <form id="rsvpForm" onsubmit="handleRSVP(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1" for="guestName">Nombre Completo *</label>
+                    <input type="text" id="guestName" required placeholder="Ej: María García" 
+                           class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none transition">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-1">¿Asistirás? *</label>
+                        <select id="attendance" required onchange="toggleGuestsInput(this.value)"
+                                class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none transition bg-white">
+                            <option value="si">¡Sí, ahí estaré! 🎉</option>
+                            <option value="no">Lo siento, no puedo 😢</option>
+                        </select>
+                    </div>
+
+                    <div id="guestsWrapper">
+                        <label class="block text-sm font-bold text-slate-700 mb-1" for="guestsCount">Acompañantes adicionales</label>
+                        <input type="number" id="guestsCount" min="0" max="5" value="0"
+                               class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none transition">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1" for="dietary">Restricciones Alimentarias / Alergias</label>
+                    <input type="text" id="dietary" placeholder="Ej: Celíaco, Vegano, Ninguna" 
+                           class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none transition">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1" for="notes">Mensaje / Canción recomendada</label>
+                    <textarea id="notes" rows="2" placeholder="¡Déjale un mensaje al cumpleañero o tu tema musical favorito!" 
+                              class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none transition resize-none"></textarea>
+                </div>
+
+                <button type="submit" class="w-full py-4 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition transform active:scale-95 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    <span>Enviar Confirmación</span>
+                </button>
+            </form>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-4 text-white/80 text-xs">
+        <p>¡Te esperamos para celebrar en grande! ✨</p>
+    </footer>
+
+    <!-- Custom Notification Toast -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-6 py-4 rounded-xl shadow-2xl transform translate-y-32 transition-all duration-300 z-50 flex items-center gap-3">
+        <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400 text-xl"></i>
+        <div>
+            <h5 id="toastTitle" class="font-bold text-sm">Notificación</h5>
+            <p id="toastMessage" class="text-xs text-slate-300">Mensaje de confirmación</p>
+        </div>
+    </div>
+
+    <!-- Modal Editar Datos del Evento y Foto -->
+    <div id="editModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md hidden justify-center items-center p-4 z-50 overflow-y-auto">
+        <div class="glass-card bg-white w-full max-w-xl rounded-3xl shadow-2xl border border-white/40 overflow-hidden flex flex-col my-auto">
+            <div class="p-5 bg-slate-900 text-white flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-pen-to-square text-amber-400 text-xl"></i>
+                    <h3 class="font-bold text-lg">Personalizar Tarjeta de Cumpleaños</h3>
+                </div>
+                <button onclick="toggleEditModal()" class="text-slate-400 hover:text-white text-xl">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form onsubmit="saveEventConfig(event)" class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Foto de la Cumpleañera</label>
+                    <input type="file" id="editPhotoInput" accept="image/*" onchange="handleImageUpload(event)" 
+                           class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100 cursor-pointer">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Nombre</label>
+                    <input type="text" id="editName" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-pink-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Descripción / Código de Vestimenta</label>
+                    <textarea id="editSubtitle" required rows="2" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-pink-500 resize-none" placeholder="Ej: ¡Código de Vestimenta: Elegante Sport! Te espero para celebrar juntos."></textarea>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Fecha (Texto)</label>
+                        <input type="text" id="editDate" required placeholder="Ej: Sábado, 20 de Nov" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-pink-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Horario</label>
+                        <input type="text" id="editTime" required placeholder="Ej: 20:30 HS" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-pink-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Dirección del Evento</label>
+                    <input type="text" id="editAddress" required placeholder="Ej: Av. Principal #123" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-pink-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Fecha y Hora Objetivo (Cuenta Regresiva)</label>
+                    <input type="datetime-local" id="editTargetDate" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-pink-500">
+                </div>
+
+                <div class="pt-2 flex justify-end gap-2">
+                    <button type="button" onclick="toggleEditModal()" class="px-4 py-2 bg-slate-200 text-slate-700 text-sm rounded-xl font-semibold">Cancelar</button>
+                    <button type="submit" class="px-5 py-2 bg-pink-500 hover:bg-pink-600 text-white text-sm rounded-xl font-bold shadow-lg">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Admin (Protegido con PIN) -->
+    <div id="adminModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md hidden justify-center items-center p-4 z-40">
+        <div class="glass-card bg-white w-full max-w-4xl rounded-3xl shadow-2xl border border-white/40 overflow-hidden flex flex-col max-h-[90vh]">
+            
+            <!-- Modal Header -->
+            <div class="p-6 bg-slate-900 text-white flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-list-check text-pink-400 text-xl"></i>
+                    <h3 class="font-bold text-lg">Panel de Administración de Invitados</h3>
+                </div>
+                <button onclick="toggleAdminModal()" class="text-slate-400 hover:text-white text-xl">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- PIN View (Si no está autenticado) -->
+            <div id="pinView" class="p-8 text-center flex flex-col items-center justify-center my-auto">
+                <div class="w-16 h-16 bg-pink-100 text-pink-500 rounded-full flex items-center justify-center mb-4 text-2xl">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <h4 class="font-bold text-xl text-slate-800 mb-2">Acceso Restringido</h4>
+                <p class="text-slate-500 text-sm mb-6">Ingresa el PIN de administrador para ver la lista de confirmados (PIN por defecto: <span class="font-mono bg-slate-100 px-2 py-1 rounded font-bold">1234</span>)</p>
+                <form onsubmit="verifyPin(event)" class="flex gap-2 max-w-xs w-full">
+                    <input type="password" id="adminPin" placeholder="PIN" required maxlength="6" 
+                           class="w-full px-4 py-2 border border-slate-300 rounded-xl text-center text-lg font-mono tracking-widest focus:ring-2 focus:ring-pink-500 outline-none">
+                    <button type="submit" class="bg-pink-500 hover:bg-pink-600 text-white font-bold px-4 py-2 rounded-xl transition">
+                        Entrar
+                    </button>
+                </form>
+            </div>
+
+            <!-- Content View (Si está autenticado) -->
+            <div id="adminContentView" class="hidden flex-col flex-grow overflow-hidden">
+                <!-- Stats Header -->
+                <div class="grid grid-cols-3 gap-4 p-4 bg-slate-50 border-b border-slate-200 text-center">
+                    <div class="p-3 bg-white rounded-xl shadow-sm border border-slate-100">
+                        <span class="text-xs text-slate-400 font-bold uppercase">Confirmados (Sí)</span>
+                        <p id="statConfirmed" class="text-2xl font-extrabold text-emerald-500">0</p>
+                    </div>
+                    <div class="p-3 bg-white rounded-xl shadow-sm border border-slate-100">
+                        <span class="text-xs text-slate-400 font-bold uppercase">Total Personas</span>
+                        <p id="statTotalPeople" class="text-2xl font-extrabold text-blue-500">0</p>
+                    </div>
+                    <div class="p-3 bg-white rounded-xl shadow-sm border border-slate-100">
+                        <span class="text-xs text-slate-400 font-bold uppercase">Declinaron (No)</span>
+                        <p id="statDeclined" class="text-2xl font-extrabold text-rose-500">0</p>
+                    </div>
+                </div>
+
+                <!-- Controls & Export -->
+                <div class="p-4 flex flex-wrap justify-between items-center gap-3 border-b border-slate-100 bg-white">
+                    <div class="relative flex-grow max-w-xs">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-sm"></i>
+                        <input type="text" id="searchInput" onkeyup="filterGuests()" placeholder="Buscar invitado..." 
+                               class="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-pink-500">
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="exportToCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold px-4 py-2 rounded-lg flex items-center gap-2 transition shadow">
+                            <i class="fa-solid fa-file-excel"></i> Exportar CSV
+                        </button>
+                        <button onclick="exportToJSON()" class="bg-slate-700 hover:bg-slate-800 text-white text-sm font-semibold px-4 py-2 rounded-lg flex items-center gap-2 transition shadow">
+                            <i class="fa-solid fa-file-code"></i> Exportar JSON
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Table Container -->
+                <div class="flex-grow overflow-y-auto p-4">
+                    <table class="w-full text-left text-sm border-collapse">
+                        <thead>
+                            <tr class="text-slate-400 uppercase text-xs border-b border-slate-200">
+                                <th class="pb-3 px-2">Invitado</th>
+                                <th class="pb-3 px-2">Estado</th>
+                                <th class="pb-3 px-2">Acompañantes</th>
+                                <th class="pb-3 px-2">Dieta / Alergia</th>
+                                <th class="pb-3 px-2">Mensaje</th>
+                                <th class="pb-3 px-2 text-right">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="guestsTableBody" class="divide-y divide-slate-100 text-slate-700">
+                            <!-- Filas dinámicas -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="p-4 bg-slate-50 border-t border-slate-200 flex justify-between items-center">
+                    <button onclick="clearAllData()" class="text-xs text-rose-500 hover:text-rose-700 font-bold flex items-center gap-1">
+                        <i class="fa-solid fa-trash-can"></i> Borrar todos los registros
+                    </button>
+                    <span id="recordCount" class="text-xs text-slate-400">0 registros</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Script Principal -->
+    <script>
+        // Configuración Por Defecto del Evento
+        let eventConfig = {
+            name: "Alex",
+            subtitle: "Un día especial para celebrar, compartir risas y crear recuerdos memorables. ¡Código de Vestimenta: Formal / Elegante!",
+            dateStr: "Sábado, 20 de Noviembre",
+            timeStr: "20:30 HS (Noche)",
+            address: "Av. Principal #123",
+            targetDate: "2026-11-20T20:30",
+            photoUrl: "https://placehold.co/400x400/e73c7e/ffffff?text=Mi+Foto"
+        };
+
+        // PIN de Administración
+        const ADMIN_PIN = "1234";
+        let isAdminAuthenticated = false;
+        let countdownTimer = null;
+
+        // Inicialización al cargar la página
+        window.onload = function() {
+            loadEventConfig();
+            updateDOMWithConfig();
+            startCountdown();
+            
+            // Disparar un poco de confeti al abrir
+            confetti({
+                particleCount: 40,
+                spread: 60,
+                origin: { y: 0.6 }
+            });
+        };
+
+        // --- Cargar / Guardar Configuración del Evento ---
+        function loadEventConfig() {
+            const saved = localStorage.getItem('birthday_event_config');
+            if (saved) {
+                try {
+                    eventConfig = { ...eventConfig, ...JSON.parse(saved) };
+                } catch(e) {}
+            }
+        }
+
+        function updateDOMWithConfig() {
+            document.getElementById('displayName').innerText = eventConfig.name;
+            document.getElementById('displaySubtitle').innerText = eventConfig.subtitle;
+            document.getElementById('displayDate').innerText = eventConfig.dateStr;
+            document.getElementById('displayTime').innerText = eventConfig.timeStr;
+            document.getElementById('displayAddress').innerText = eventConfig.address;
+            document.getElementById('navTitle').innerText = `${eventConfig.name.toUpperCase()}'S PARTY`;
+            if (eventConfig.photoUrl) {
+                document.getElementById('birthdayPhoto').src = eventConfig.photoUrl;
+            }
+        }
+
+        function toggleEditModal() {
+            const modal = document.getElementById('editModal');
+            modal.classList.toggle('hidden');
+            modal.classList.toggle('flex');
+
+            if (!modal.classList.contains('hidden')) {
+                // Llenar inputs con los valores actuales
+                document.getElementById('editName').value = eventConfig.name;
+                document.getElementById('editSubtitle').value = eventConfig.subtitle;
+                document.getElementById('editDate').value = eventConfig.dateStr;
+                document.getElementById('editTime').value = eventConfig.timeStr;
+                document.getElementById('editAddress').value = eventConfig.address;
+                document.getElementById('editTargetDate').value = eventConfig.targetDate;
+            }
+        }
+
+        function handleImageUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    eventConfig.photoUrl = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function saveEventConfig(e) {
+            e.preventDefault();
+            eventConfig.name = document.getElementById('editName').value;
+            eventConfig.subtitle = document.getElementById('editSubtitle').value;
+            eventConfig.dateStr = document.getElementById('editDate').value;
+            eventConfig.timeStr = document.getElementById('editTime').value;
+            eventConfig.address = document.getElementById('editAddress').value;
+            eventConfig.targetDate = document.getElementById('editTargetDate').value;
+
+            localStorage.setItem('birthday_event_config', JSON.stringify(eventConfig));
+            updateDOMWithConfig();
+            startCountdown();
+            toggleEditModal();
+            showToast("¡Datos de la invitación actualizados!", "success");
+        }
+
+        // --- CUENTA REGRESIVA ---
+        function startCountdown() {
+            if (countdownTimer) clearInterval(countdownTimer);
+
+            function update() {
+                const partyDate = new Date(eventConfig.targetDate);
+                const now = new Date();
+                const diff = partyDate - now;
+
+                if (isNaN(diff) || diff <= 0) {
+                    document.getElementById('days').innerText = "00";
+                    document.getElementById('hours').innerText = "00";
+                    document.getElementById('minutes').innerText = "00";
+                    document.getElementById('seconds').innerText = "00";
+                    return;
+                }
+
+                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                const m = Math.floor((diff / 1000 / 60) % 60);
+                const s = Math.floor((diff / 1000) % 60);
+
+                document.getElementById('days').innerText = String(d).padStart(2, '0');
+                document.getElementById('hours').innerText = String(h).padStart(2, '0');
+                document.getElementById('minutes').innerText = String(m).padStart(2, '0');
+                document.getElementById('seconds').innerText = String(s).padStart(2, '0');
+            }
+
+            update();
+            countdownTimer = setInterval(update, 1000);
+        }
+
+        // Mostrar / Ocultar campo de acompañantes según respuesta
+        function toggleGuestsInput(value) {
+            const wrapper = document.getElementById('guestsWrapper');
+            if (value === 'no') {
+                wrapper.style.display = 'none';
+                document.getElementById('guestsCount').value = 0;
+            } else {
+                wrapper.style.display = 'block';
+            }
+        }
+
+        // --- MANEJO DE LOCALSTORAGE & RSVP ---
+        function getGuests() {
+            const data = localStorage.getItem('birthday_guests_rsvp');
+            return data ? JSON.parse(data) : [];
+        }
+
+        function saveGuests(guests) {
+            localStorage.setItem('birthday_guests_rsvp', JSON.stringify(guests));
+        }
+
+        function handleRSVP(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('guestName').value.trim();
+            const attendance = document.getElementById('attendance').value;
+            const guestsCount = parseInt(document.getElementById('guestsCount').value) || 0;
+            const dietary = document.getElementById('dietary').value.trim();
+            const notes = document.getElementById('notes').value.trim();
+
+            if (!name) {
+                showToast("Por favor ingresa tu nombre", "error");
+                return;
+            }
+
+            const newGuest = {
+                id: Date.now(),
+                name,
+                attendance,
+                guestsCount: attendance === 'si' ? guestsCount : 0,
+                dietary: dietary || "Ninguna",
+                notes: notes || "-",
+                timestamp: new Date().toLocaleString()
+            };
+
+            const guests = getGuests();
+            guests.push(newGuest);
+            saveGuests(guests);
+
+            // Efectos y Feedback
+            if (attendance === 'si') {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+                showToast(`¡Gracias ${name}! Tu asistencia ha sido confirmada. 🎉`, "success");
+            } else {
+                showToast(`Gracias por avisarnos, ${name}. ¡Te extrañaremos!`, "info");
+            }
+
+            document.getElementById('rsvpForm').reset();
+            toggleGuestsInput('si');
+        }
+
+        // --- NOTIFICACIONES (TOAST) ---
+        function showToast(message, type = "success") {
+            const toast = document.getElementById('toast');
+            const toastTitle = document.getElementById('toastTitle');
+            const toastMessage = document.getElementById('toastMessage');
+            const toastIcon = document.getElementById('toastIcon');
+
+            toastMessage.innerText = message;
+
+            if (type === "success") {
+                toastTitle.innerText = "¡Confirmado!";
+                toastIcon.className = "fa-solid fa-circle-check text-emerald-400 text-xl";
+            } else if (type === "info") {
+                toastTitle.innerText = "Registrado";
+                toastIcon.className = "fa-solid fa-circle-info text-blue-400 text-xl";
+            } else {
+                toastTitle.innerText = "Atención";
+                toastIcon.className = "fa-solid fa-triangle-exclamation text-amber-400 text-xl";
+            }
+
+            toast.classList.remove('translate-y-32');
+            setTimeout(() => {
+                toast.classList.add('translate-y-32');
+            }, 4000);
+        }
+
+        // --- MODAL DE ADMINISTRACIÓN ---
+        function toggleAdminModal() {
+            const modal = document.getElementById('adminModal');
+            modal.classList.toggle('hidden');
+            modal.classList.toggle('flex');
+
+            if (!modal.classList.contains('hidden') && isAdminAuthenticated) {
+                renderGuestsTable();
+            }
+        }
+
+        function verifyPin(event) {
+            event.preventDefault();
+            const inputPin = document.getElementById('adminPin').value;
+
+            if (inputPin === ADMIN_PIN) {
+                isAdminAuthenticated = true;
+                document.getElementById('pinView').classList.add('hidden');
+                document.getElementById('adminContentView').classList.remove('hidden');
+                document.getElementById('adminContentView').classList.add('flex');
+                renderGuestsTable();
+            } else {
+                showToast("PIN incorrecto. Intenta con: 1234", "error");
+                document.getElementById('adminPin').value = '';
+            }
+        }
+
+        function renderGuestsTable() {
+            const guests = getGuests();
+            const tbody = document.getElementById('guestsTableBody');
+            tbody.innerHTML = '';
+
+            let confirmedCount = 0;
+            let totalPeopleCount = 0;
+            let declinedCount = 0;
+
+            if (guests.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center py-8 text-slate-400">
+                            No hay confirmaciones registradas aún.
+                        </td>
+                    </tr>`;
+            } else {
+                guests.forEach(guest => {
+                    const isAttending = guest.attendance === 'si';
+                    if (isAttending) {
+                        confirmedCount++;
+                        totalPeopleCount += (1 + parseInt(guest.guestsCount));
+                    } else {
+                        declinedCount++;
+                    }
+
+                    const row = document.createElement('tr');
+                    row.className = "hover:bg-slate-50/80 transition";
+                    row.innerHTML = `
+                        <td class="py-3 px-2 font-bold text-slate-800">
+                            ${escapeHtml(guest.name)}
+                            <div class="text-[10px] text-slate-400 font-normal">${guest.timestamp}</div>
+                        </td>
+                        <td class="py-3 px-2">
+                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${isAttending ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}">
+                                ${isAttending ? 'Asistirá' : 'No asistirá'}
+                            </span>
+                        </td>
+                        <td class="py-3 px-2 font-semibold">
+                            ${isAttending ? `+${guest.guestsCount}` : '-'}
+                        </td>
+                        <td class="py-3 px-2 text-slate-600">
+                            ${escapeHtml(guest.dietary)}
+                        </td>
+                        <td class="py-3 px-2 text-slate-500 italic max-w-xs truncate" title="${escapeHtml(guest.notes)}">
+                            "${escapeHtml(guest.notes)}"
+                        </td>
+                        <td class="py-3 px-2 text-right">
+                            <button onclick="deleteGuest(${guest.id})" class="text-slate-400 hover:text-rose-600 transition px-2 py-1">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+
+            // Actualizar Estadísticas
+            document.getElementById('statConfirmed').innerText = confirmedCount;
+            document.getElementById('statTotalPeople').innerText = totalPeopleCount;
+            document.getElementById('statDeclined').innerText = declinedCount;
+            document.getElementById('recordCount').innerText = `${guests.length} registro(s)`;
+        }
+
+        function filterGuests() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#guestsTableBody tr');
+
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(query) ? '' : 'none';
+            });
+        }
+
+        function deleteGuest(id) {
+            let guests = getGuests();
+            guests = guests.filter(g => g.id !== id);
+            saveGuests(guests);
+            renderGuestsTable();
+            showToast("Registro eliminado", "info");
+        }
+
+        function clearAllData() {
+            if (getGuests().length === 0) return;
+            
+            // Usamos un cuadro de confirmación personalizado en modal (sin alert/confirm nativo)
+            if (window.confirm("¿Seguro que deseas eliminar TODOS los registros registrados? Esta acción no se puede deshacer.")) {
+                localStorage.removeItem('birthday_guests_rsvp');
+                renderGuestsTable();
+                showToast("Todos los registros han sido borrados", "info");
+            }
+        }
+
+        // --- EXPORTACIÓN DE DATOS (CSV & JSON) ---
+        function exportToCSV() {
+            const guests = getGuests();
+            if (guests.length === 0) {
+                showToast("No hay registros para exportar", "error");
+                return;
+            }
+
+            // Encabezados CSV
+            const headers = ["ID", "Nombre", "Asistira", "Acompanantes", "Restricciones Dietarias", "Mensaje", "Fecha Registro"];
+            
+            // Mapeo de datos escapando comillas
+            const rows = guests.map(g => [
+                g.id,
+                `"${(g.name || '').replace(/"/g, '""')}"`,
+                `"${g.attendance === 'si' ? 'SI' : 'NO'}"`,
+                g.guestsCount,
+                `"${(g.dietary || '').replace(/"/g, '""')}"`,
+                `"${(g.notes || '').replace(/"/g, '""')}"`,
+                `"${g.timestamp}"`
+            ]);
+
+            // Construir contenido con BOM para soporte UTF-8 en Excel
+            const csvContent = "\uFEFF" + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+            
+            // Crear link de descarga
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", `invitados_cumpleanos_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showToast("Lista exportada a CSV exitosamente", "success");
+        }
+
+        function exportToJSON() {
+            const guests = getGuests();
+            if (guests.length === 0) {
+                showToast("No hay registros para exportar", "error");
+                return;
+            }
+
+            const jsonStr = JSON.stringify(guests, null, 2);
+            const blob = new Blob([jsonStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", `invitados_cumpleanos_${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showToast("Lista exportada a JSON exitosamente", "success");
+        }
+
+        // Auxiliar para evitar inyección de HTML en tabla
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
